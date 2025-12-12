@@ -1,70 +1,51 @@
-# Getting Started with Create React App
+# Social AI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React web app that blends AI image generation with a social-style gallery. Users can describe scenes to create images with OpenAI, upload them, browse/delete their own media, and search collections by user or keyword.
 
-## Available Scripts
+## Features
+- AI landing page: prompt DALL·E for images, preview in a lightbox, and upload the generated result.
+- Auth: login/register flows backed by the configured API.
+- Collections: tabbed photo/video gallery with delete controls, search (all/keyword/user), and responsive navbar.
+- Create post: modal form to upload images or videos.
 
-In the project directory, you can run:
+## Tech stack
+React (CRA), React Router, MUI + Ant Design UI, OpenAI SDK, react-photo-album, yet-another-react-lightbox, axios, styled-components, http-proxy-middleware.
 
-### `npm start`
+## Getting started
+1) Install dependencies
+```
+npm install
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+2) Add environment variables (not committed; `.env` is gitignored)
+```
+REACT_APP_OPENAI_KEY=your_openai_api_key
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+3) Run locally
+```
+npm start
+```
+The app runs at http://localhost:3000.
 
-### `npm test`
+4) Build for production
+```
+npm run build
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Configuration
+- API backend: `src/constants.js` sets `BASE_URL` for auth/posts/search. Adjust if you host your own backend.
+- OpenAI: the key is read from `REACT_APP_OPENAI_KEY`. For production, set it via your hosting provider’s environment settings (GitHub Secrets, AWS Amplify/EB/EC2, etc.) rather than committing a `.env`.
+- Media proxy: `src/setupProxy.js` proxies `/api` to the blob storage host used when downloading generated images, to avoid CORS issues. Leave it in place unless you change where images are fetched from.
 
-### `npm run build`
+## Scripts
+- `npm start` — dev server
+- `npm test` — CRA test runner
+- `npm run build` — production build
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Security notes
+- Do not expose real API keys in public frontends. This demo calls OpenAI from the client; for production, front key usage through a backend or function proxy and store secrets in your platform’s secret manager.
+- `.env` stays local and is ignored by git; set env vars separately in CI/hosting.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## License
+MIT (see LICENSE). Replace with your preferred license if needed.
