@@ -100,41 +100,49 @@ export default function Landing() {
   };
 
   const handleUploadImage = async () => {
-    fetch(generatedImageUrl.replace(/https:\/\/[^\/]+/, "/api"))
-      .then((response) => response.blob())
-      .then((blob) => {
-        let formData = new FormData();
-        formData.append("message", "AI generated image");
-        // Create a file from the blob
-        const file = new File([blob], `upload.jpg`, {
-          type: `image/jpg`,
-        });
-        formData.append("media_file", file);
+    if (!generatedImageUrl) {
+      message.error("Please generate an image first.");
+      return;
+    }
 
-        const opt = {
-          method: "POST",
-          url: `${BASE_URL}/upload`,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
-          },
-          data: formData,
-        };
+    // CRA proxy only works in local dev; use the real URL once deployed.
+    const fetchUrl =
+      process.env.NODE_ENV === "development"
+        ? generatedImageUrl.replace(/https:\/\/[^/]+/, "/api")
+        : generatedImageUrl;
 
-        axios(opt)
-          .then((res) => {
-            if (res.status === 200) {
-              console.log("success!!!");
-              message.success("The image/video is uploaded!");
-            }
-          })
-          .catch((err) => {
-            console.log("Upload image/video failed: ", err.message);
-            message.error("Failed to upload image/video!");
-          })
-          .finally(() => {
-            setIndex(-1); // close the lightbox
-          });
-      });
+    try {
+      const response = await fetch(fetchUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+      const blob = await response.blob();
+
+      const formData = new FormData();
+      formData.append("message", "AI generated image");
+      const file = new File([blob], "upload.jpg", { type: "image/jpg" });
+      formData.append("media_file", file);
+
+      const opt = {
+        method: "POST",
+        url: `${BASE_URL}/upload`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        },
+        data: formData,
+      };
+
+      const res = await axios(opt);
+      if (res.status === 200) {
+        console.log("success!!!");
+        message.success("The image/video is uploaded!");
+      }
+    } catch (err) {
+      console.log("Upload image/video failed: ", err.message);
+      message.error("Failed to upload image/video!");
+    } finally {
+      setIndex(-1); // close the lightbox
+    }
   };
 
   return (
