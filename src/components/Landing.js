@@ -81,10 +81,12 @@ export default function Landing() {
         prompt: inputValue,
         n: 1,
         size: "1024x1024",
+        response_format: "b64_json", // avoid cross-origin blob fetches
       });
 
-      const image_url = response.data[0].url;
-      setGeneratedImageUrl(image_url);
+      const b64 = response.data[0].b64_json;
+      const imageUrl = `data:image/png;base64,${b64}`;
+      setGeneratedImageUrl(imageUrl);
     } catch (err) {
       message.error(
         "Something went wrong with AI generated image. Please try again."
@@ -105,22 +107,20 @@ export default function Landing() {
       return;
     }
 
-    // CRA proxy only works in local dev; use the real URL once deployed.
-    const fetchUrl =
-      process.env.NODE_ENV === "development"
-        ? generatedImageUrl.replace(/https:\/\/[^/]+/, "/api")
-        : generatedImageUrl;
-
     try {
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      // Convert data URL -> Blob to avoid cross-origin fetch.
+      const base64 = generatedImageUrl.split(",")[1];
+      const byteCharacters = atob(base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-      const blob = await response.blob();
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "image/png" });
 
       const formData = new FormData();
       formData.append("message", "AI generated image");
-      const file = new File([blob], "upload.jpg", { type: "image/jpg" });
+      const file = new File([blob], "upload.png", { type: "image/png" });
       formData.append("media_file", file);
 
       const opt = {
