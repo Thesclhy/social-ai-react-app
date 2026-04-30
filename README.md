@@ -48,4 +48,4 @@ npm run build
 - `.env` stays local and is ignored by git; set env vars separately in CI/hosting.
 
 ## License
-MIT (see LICENSE). Replace with your preferred license if needed.
+MIT (see LICENSE). 
